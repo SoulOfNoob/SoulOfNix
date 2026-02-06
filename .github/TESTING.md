@@ -10,7 +10,7 @@
 ## What It Tests
 
 **Linux (Docker):** Debian, Alpine, Arch, Slackware
-**macOS (Native):** Apple Silicon (M1/M2), Intel (x86_64)
+**macOS (Native):** macOS 14 (Sonoma), macOS 15 (Sequoia) - Apple Silicon
 
 Each platform:
 - ✅ Installs Nix

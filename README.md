@@ -163,7 +163,7 @@ Manual testing workflow available for comprehensive cross-platform testing:
 
 **Platforms tested:**
 - Linux: Debian, Alpine, Arch, Slackware (Docker)
-- macOS: Apple Silicon (M1/M2), Intel (x86_64)
+- macOS: Sonoma (14), Sequoia (15) - Apple Silicon
 - Total: 6 platforms tested automatically
 
 ## Updating
