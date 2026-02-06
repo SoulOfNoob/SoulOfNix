@@ -4,10 +4,10 @@
 
 {
   # Minimal additional packages
-  home.packages = with pkgs; [
+  home.packages = [
     # Basic utilities
-    procps
-    coreutils
+    pkgs.procps
+    pkgs.coreutils
   ];
 
   # ZSH configuration for Slackware/UnRAID
@@ -16,7 +16,7 @@
       "git"
       "node"
       "npm"
-      "docker"        # Docker is common on UnRAID
+      "docker" # Docker is common on UnRAID
       "github"
       "yarn"
       "ssh-agent"
@@ -72,7 +72,7 @@
   };
 
   # Special activation for UnRAID persistent storage
-  home.activation.unraidPersistence = lib.hm.dag.entryAfter ["writeBoundary"] ''
+  home.activation.unraidPersistence = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     # Create persistent directory on UnRAID's /boot partition
     if [ -d /boot/config ] && [ -w /boot/config ]; then
       $DRY_RUN_CMD mkdir -p /boot/config/extra

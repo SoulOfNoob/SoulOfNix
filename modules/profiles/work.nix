@@ -2,23 +2,23 @@
 { config, lib, pkgs, ... }:
 
 {
-  imports = [ ./local.nix ];  # Work extends local profile
+  imports = [ ./local.nix ]; # Work extends local profile
 
   # Additional packages for work
-  home.packages = with pkgs; [
+  home.packages = [
     # Container tools
-    docker-compose
+    pkgs.docker-compose
 
     # Cloud tools
-    awscli2
+    pkgs.awscli2
 
     # Database tools
-    mysql-client
-    postgresql
+    pkgs.mysql-client
+    pkgs.postgresql
 
     # PHP development (if needed)
-    # php82
-    # php82Packages.composer
+    # pkgs.php82
+    # pkgs.php82Packages.composer
   ];
 
   # Work-specific ZSH configuration

@@ -40,7 +40,7 @@ in
         "vscode"
         "yarn"
       ] ++ lib.optionals isLinux [
-        "ssh-agent"  # Linux only - macOS uses 1Password SSH agent
+        "ssh-agent" # Linux only - macOS uses 1Password SSH agent
       ];
     };
 
@@ -48,7 +48,9 @@ in
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
 
-    # Shell aliases - use mkDefault so profiles can override
+    # Shell aliases
+    # Using lib.mapAttrs with lib.mkDefault allows profiles to override these base aliases
+    # without having to use lib.mkForce - profiles can just set the alias normally
     shellAliases = lib.mapAttrs (name: lib.mkDefault) {
       # Git aliases
       gcb = "git checkout -b";

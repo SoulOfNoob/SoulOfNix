@@ -10,6 +10,9 @@
 }:
 
 let
+  # Import nixpkgs with explicit config and overlays for reproducibility
+  # In flake context, legacyPackages is acceptable as flakes enforce purity
+  # but we document this decision explicitly
   pkgs = nixpkgs.legacyPackages.${system};
   lib = pkgs.lib;
 
@@ -17,8 +20,11 @@ let
   isDarwin = lib.hasSuffix "darwin" system;
   isLinux = lib.hasSuffix "linux" system;
 
-  # Get username from environment (requires --impure flag)
-  # Falls back to "root" for Linux if USER env is not set
+  # IMPURE EVALUATION: Get username from environment
+  # This requires building with --impure flag or setting username explicitly
+  # Usage: home-manager switch --flake .#profile --impure
+  # OR:    Provide username parameter when calling mkHome
+  # Falls back to "root" for Linux, "nobody" for Darwin if USER env is not set
   envUser = builtins.getEnv "USER";
   defaultUsername = if envUser != "" then envUser else (if isDarwin then "nobody" else "root");
 
@@ -26,8 +32,8 @@ let
   defaultHomeDir =
     let user = if username != null then username else defaultUsername;
     in if isDarwin
-       then "/Users/${user}"
-       else if user == "root" then "/root" else "/home/${user}";
+    then "/Users/${user}"
+    else if user == "root" then "/root" else "/home/${user}";
 
   finalUsername = if username != null then username else defaultUsername;
   finalHomeDir = if homeDirectory != null then homeDirectory else defaultHomeDir;

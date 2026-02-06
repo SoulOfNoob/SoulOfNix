@@ -1,11 +1,11 @@
 # Remote profile - minimal configuration for servers
-{ config, lib, pkgs, authorizedKeys ? [], ... }:
+{ config, lib, pkgs, authorizedKeys ? [ ], ... }:
 
 {
   imports = [ ./base.nix ];
 
   # Minimal package set for servers
-  home.packages = with pkgs; [
+  home.packages = [
     # Keep it minimal - core tools only
     # Additional tools from home/default.nix are still included
   ];
@@ -28,13 +28,13 @@
   };
 
   # SSH authorized keys from GitHub
-  home.file.".ssh/authorized_keys" = lib.mkIf (authorizedKeys != []) {
+  home.file.".ssh/authorized_keys" = lib.mkIf (authorizedKeys != [ ]) {
     text = lib.concatStringsSep "\n" authorizedKeys + "\n";
   };
 
   # Disable some heavier features
-  programs.tmux.plugins = lib.mkForce (with pkgs.tmuxPlugins; [
-    sensible
-    yank
-  ]);
+  programs.tmux.plugins = lib.mkForce [
+    pkgs.tmuxPlugins.sensible
+    pkgs.tmuxPlugins.yank
+  ];
 }

@@ -189,6 +189,13 @@ chsh -s $(which zsh)
 
 See [DEVELOPMENT.md](DEVELOPMENT.md) for implementation notes, gotchas, and lessons learned.
 
+## Documentation
+
+- **[IMPROVEMENTS.md](IMPROVEMENTS.md)** - Recent code improvements and refactoring summary
+- **[NIX_BEST_PRACTICES.md](NIX_BEST_PRACTICES.md)** - Comprehensive Nix best practices guide
+- **[DEVELOPMENT.md](DEVELOPMENT.md)** - Implementation notes and lessons learned
+- **[MIGRATION.md](MIGRATION.md)** - Migration guide from other setups
+
 ## License
 
 MIT

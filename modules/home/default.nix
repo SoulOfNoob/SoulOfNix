@@ -10,26 +10,26 @@
   ];
 
   # Common packages for all profiles
-  home.packages = with pkgs; [
+  home.packages = [
     # Core utilities
-    git
-    wget
-    curl
-    tree
-    htop
-    nano
+    pkgs.git
+    pkgs.wget
+    pkgs.curl
+    pkgs.tree
+    pkgs.htop
+    pkgs.nano
 
     # Shell utilities
-    zsh
-    tmux
+    pkgs.zsh
+    pkgs.tmux
 
     # Network utilities
-    openssh
+    pkgs.openssh
 
     # Additional useful tools
-    jq
-    ripgrep
-    fd
+    pkgs.jq
+    pkgs.ripgrep
+    pkgs.fd
   ];
 
   # Enable home-manager to manage itself

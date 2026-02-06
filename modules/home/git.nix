@@ -5,10 +5,10 @@
   programs.git = {
     enable = true;
 
-    # User info - to be overridden per profile/user
-    # These are defaults, actual values should be set via extraConfig or profile
-    userName = lib.mkDefault "";
-    userEmail = lib.mkDefault "";
+    # User info should be set per profile/user or via per-repo config
+    # Not setting defaults here to avoid git errors with empty strings
+    # userName = "Your Name";  # Set in profile or extraConfig
+    # userEmail = "you@example.com";  # Set in profile or extraConfig
 
     # Core settings
     extraConfig = {

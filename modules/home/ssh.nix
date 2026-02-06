@@ -1,5 +1,5 @@
 # SSH configuration
-{ config, lib, pkgs, authorizedKeys ? [], ... }:
+{ config, lib, pkgs, authorizedKeys ? [ ], ... }:
 
 let
   inherit (pkgs.stdenv) isDarwin isLinux;
@@ -39,13 +39,13 @@ in
   home.file.".ssh/sockets/.keep".text = "";
 
   # Manage authorized_keys for remote profile
-  home.file.".ssh/authorized_keys" = lib.mkIf (authorizedKeys != []) {
+  home.file.".ssh/authorized_keys" = lib.mkIf (authorizedKeys != [ ]) {
     text = lib.concatStringsSep "\n" authorizedKeys + "\n";
   };
 
   # SSH directory permissions are handled by home-manager activation
   # Note: Only chmod real files, not symlinks (which point to read-only nix store)
-  home.activation.sshPermissions = lib.hm.dag.entryAfter ["writeBoundary"] ''
+  home.activation.sshPermissions = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     if [ -d "$HOME/.ssh" ]; then
       $DRY_RUN_CMD chmod 700 "$HOME/.ssh"
       # Only chmod if it's a real file, not a symlink

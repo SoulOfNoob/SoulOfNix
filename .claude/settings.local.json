@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:nix.dev)",
+      "Bash(nix flake check:*)",
+      "Bash(find:*)"
+    ]
+  }
+}

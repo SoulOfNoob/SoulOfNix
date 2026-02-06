@@ -36,18 +36,18 @@
     prefix = "C-a";
 
     # Plugins
-    plugins = with pkgs.tmuxPlugins; [
-      sensible
-      yank
+    plugins = [
+      pkgs.tmuxPlugins.sensible
+      pkgs.tmuxPlugins.yank
       {
-        plugin = resurrect;
+        plugin = pkgs.tmuxPlugins.resurrect;
         extraConfig = ''
           set -g @resurrect-capture-pane-contents 'on'
           set -g @resurrect-strategy-nvim 'session'
         '';
       }
       {
-        plugin = continuum;
+        plugin = pkgs.tmuxPlugins.continuum;
         extraConfig = ''
           set -g @continuum-restore 'on'
           set -g @continuum-save-interval '10'

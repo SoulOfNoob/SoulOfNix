@@ -3,11 +3,11 @@
 
 {
   # macOS-specific packages
-  home.packages = with pkgs; [
+  home.packages = [
     # macOS utilities
-    coreutils      # GNU coreutils (prefixed with 'g')
-    gnused         # GNU sed
-    gnugrep        # GNU grep
+    pkgs.coreutils # GNU coreutils (prefixed with 'g')
+    pkgs.gnused # GNU sed
+    pkgs.gnugrep # GNU grep
   ];
 
   # ZSH adjustments for macOS
@@ -21,8 +21,8 @@
       "github"
       "vscode"
       "yarn"
-      "macos"        # macOS-specific plugin
-      "brew"         # Homebrew integration
+      "macos" # macOS-specific plugin
+      "brew" # Homebrew integration
     ];
 
     initContent = lib.mkAfter ''
@@ -35,9 +35,18 @@
         eval "$(/usr/local/bin/brew shellenv)"
       fi
 
-      # Use GNU tools without 'g' prefix
-      export PATH="$(brew --prefix coreutils 2>/dev/null)/libexec/gnubin:$PATH" 2>/dev/null || true
-      export PATH="$(brew --prefix gnu-sed 2>/dev/null)/libexec/gnubin:$PATH" 2>/dev/null || true
+      # Use GNU tools without 'g' prefix (use fixed paths to avoid slow brew --prefix calls)
+      if [[ -d /opt/homebrew/opt/coreutils/libexec/gnubin ]]; then
+        export PATH="/opt/homebrew/opt/coreutils/libexec/gnubin:$PATH"
+      elif [[ -d /usr/local/opt/coreutils/libexec/gnubin ]]; then
+        export PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"
+      fi
+
+      if [[ -d /opt/homebrew/opt/gnu-sed/libexec/gnubin ]]; then
+        export PATH="/opt/homebrew/opt/gnu-sed/libexec/gnubin:$PATH"
+      elif [[ -d /usr/local/opt/gnu-sed/libexec/gnubin ]]; then
+        export PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"
+      fi
 
       # macOS-specific aliases
       alias showfiles="defaults write com.apple.finder AppleShowAllFiles YES && killall Finder"

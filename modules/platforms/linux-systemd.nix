@@ -3,10 +3,10 @@
 
 {
   # Linux-specific packages
-  home.packages = with pkgs; [
+  home.packages = [
     # System utilities
-    procps        # ps, top, etc.
-    util-linux    # Various Linux utilities
+    pkgs.procps # ps, top, etc.
+    pkgs.util-linux # Various Linux utilities
   ];
 
   # ZSH configuration for Linux
@@ -19,8 +19,8 @@
       "github"
       "vscode"
       "yarn"
-      "ssh-agent"    # Linux uses ssh-agent plugin
-      "systemd"      # Systemd shortcuts
+      "ssh-agent" # Linux uses ssh-agent plugin
+      "systemd" # Systemd shortcuts
     ];
 
     initContent = lib.mkAfter ''

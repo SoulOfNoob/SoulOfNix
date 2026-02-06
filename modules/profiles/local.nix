@@ -5,27 +5,27 @@
   imports = [ ./base.nix ];
 
   # Additional packages for local development
-  home.packages = with pkgs; [
+  home.packages = [
     # Development tools
-    gh               # GitHub CLI
-    lazygit          # Terminal UI for git
-    delta            # Better git diffs
+    pkgs.gh # GitHub CLI
+    pkgs.lazygit # Terminal UI for git
+    pkgs.delta # Better git diffs
 
     # File utilities
-    bat              # Better cat
-    eza              # Better ls
-    fzf              # Fuzzy finder
-    zoxide           # Smarter cd
+    pkgs.bat # Better cat
+    pkgs.eza # Better ls
+    pkgs.fzf # Fuzzy finder
+    pkgs.zoxide # Smarter cd
 
     # Process utilities
-    btop             # Better htop
+    pkgs.btop # Better htop
 
     # Network utilities
-    httpie           # Better curl for APIs
+    pkgs.httpie # Better curl for APIs
 
     # Archive utilities
-    unzip
-    p7zip
+    pkgs.unzip
+    pkgs.p7zip
   ];
 
   # Enhanced ZSH for local

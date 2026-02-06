@@ -4,10 +4,10 @@
 
 {
   # Alpine-specific packages
-  home.packages = with pkgs; [
+  home.packages = [
     # Basic utilities that might not be present
-    procps
-    coreutils
+    pkgs.procps
+    pkgs.coreutils
   ];
 
   # ZSH configuration for Alpine
@@ -55,6 +55,6 @@
   # XDG directories (simpler setup for Alpine)
   xdg = {
     enable = true;
-    userDirs.enable = lib.mkDefault false;  # Alpine might not have xdg-user-dirs
+    userDirs.enable = lib.mkDefault false; # Alpine might not have xdg-user-dirs
   };
 }
