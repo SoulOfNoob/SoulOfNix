@@ -90,9 +90,9 @@
         in
         {
           default = pkgs.mkShell {
-            packages = with pkgs; [
-              nixpkgs-fmt
-              nil
+            packages = [
+              pkgs.nixpkgs-fmt
+              pkgs.nil
             ];
           };
         }

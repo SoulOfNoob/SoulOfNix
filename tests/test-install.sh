@@ -36,11 +36,15 @@ PROFILE=${TEST_PROFILE:-remote}
 FLAKE_CONFIG=$(get_flake_config "$PROFILE" "$PLATFORM" "$ARCH")
 echo "Testing profile: $FLAKE_CONFIG"
 
-# Install Nix (Docker-specific: no init system)
+# Install Nix (Docker-specific: no init system, no sandboxing due to seccomp issues)
 echo ""
 echo "Installing Nix..."
+# Note: --extra-conf filter-syscalls=false works around Docker seccomp issues
 curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | \
-  sh -s -- install linux --no-confirm --init none
+  sh -s -- install linux \
+    --no-confirm \
+    --init none \
+    --extra-conf "filter-syscalls = false"
 
 # Start nix-daemon manually (Docker has no init system)
 echo "Starting nix-daemon..."
