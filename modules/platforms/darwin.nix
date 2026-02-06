@@ -59,8 +59,8 @@
     '';
 
     shellAliases = {
-      # Use GNU ls with color by default
-      ls = "ls --color=auto";
+      # Use GNU ls with color by default (can be overridden by profiles)
+      ls = lib.mkDefault "ls --color=auto";
     };
   };
 
