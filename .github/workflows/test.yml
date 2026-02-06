@@ -1,7 +1,10 @@
 name: Tests
 
-# Manual trigger only - use "Run workflow" button in GitHub Actions tab
 on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -31,7 +34,7 @@ jobs:
           source lib/install-common.sh
           ARCH=$(detect_arch)
           OS=$(detect_os)
-          FLAKE_CONFIG=$(get_flake_config "remote" "$OS" "$ARCH")
+          FLAKE_CONFIG=$(get_flake_config "local" "$OS" "$ARCH")
 
           echo "Testing: $FLAKE_CONFIG"
           nix run nixpkgs#home-manager -- switch --flake .#${FLAKE_CONFIG} --impure
