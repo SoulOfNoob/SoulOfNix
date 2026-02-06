@@ -28,60 +28,52 @@
     in
     {
       # Home-manager configurations for each profile
-      homeConfigurations = {
-        # Remote profile - minimal for servers
-        "remote" = mkHome {
-          profile = "remote";
-          system = "x86_64-linux";
-        };
+      # Generated programmatically to reduce duplication
+      homeConfigurations =
+        let
+          # Define profiles and their supported systems
+          profiles = {
+            remote = {
+              systems = {
+                "" = "x86_64-linux";
+                "-aarch64" = "aarch64-linux";
+              };
+            };
+            local = {
+              systems = {
+                "" = "x86_64-linux";
+                "-aarch64" = "aarch64-linux";
+                "-darwin" = "aarch64-darwin";
+                "-darwin-x86" = "x86_64-darwin";
+              };
+            };
+            work = {
+              systems = {
+                "" = "x86_64-linux";
+                "-aarch64" = "aarch64-linux";
+                "-darwin" = "aarch64-darwin";
+                "-darwin-x86" = "x86_64-darwin";
+              };
+            };
+          };
 
-        "remote-aarch64" = mkHome {
-          profile = "remote";
-          system = "aarch64-linux";
-        };
-
-        # Local profile - personal machines
-        "local" = mkHome {
-          profile = "local";
-          system = "x86_64-linux";
-        };
-
-        "local-aarch64" = mkHome {
-          profile = "local";
-          system = "aarch64-linux";
-        };
-
-        "local-darwin" = mkHome {
-          profile = "local";
-          system = "aarch64-darwin";
-        };
-
-        "local-darwin-x86" = mkHome {
-          profile = "local";
-          system = "x86_64-darwin";
-        };
-
-        # Work profile
-        "work" = mkHome {
-          profile = "work";
-          system = "x86_64-linux";
-        };
-
-        "work-aarch64" = mkHome {
-          profile = "work";
-          system = "aarch64-linux";
-        };
-
-        "work-darwin" = mkHome {
-          profile = "work";
-          system = "aarch64-darwin";
-        };
-
-        "work-darwin-x86" = mkHome {
-          profile = "work";
-          system = "x86_64-darwin";
-        };
-      };
+          # Generate configurations for a profile
+          mkProfileConfigs = profileName: profileConfig:
+            nixpkgs.lib.mapAttrs'
+              (suffix: system: {
+                name = "${profileName}${suffix}";
+                value = mkHome {
+                  profile = profileName;
+                  inherit system;
+                };
+              })
+              profileConfig.systems;
+        in
+        # Merge all profile configurations
+        nixpkgs.lib.foldl'
+          (acc: profileName: acc // (mkProfileConfigs profileName profiles.${profileName}))
+          { }
+          (builtins.attrNames profiles);
 
       # Development shells for testing
       devShells = forAllSystems (system:

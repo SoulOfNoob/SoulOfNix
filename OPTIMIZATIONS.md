@@ -8,12 +8,12 @@
 **✅ COMPLETED:**
 - Item #1: Fixed `with pkgs;` in flake.nix devShells
 - Item #2: Added LICENSE file (MIT License)
-- Item #6: Updated .gitignore with Nix and direnv entries
+- Item #3: Refactored repetitive homeConfigurations (DRY - 54 lines → 45 lines)
 - Item #4 (partial): Platform duplication eliminated via hierarchical inheritance (base.nix → linux-base.nix → specific platforms)
+- Item #5: Added platform-specific notes to tests/README.md (Arch emulation, Docker seccomp, Alpine locale, UnRAID simulation)
+- Item #6: Updated .gitignore with Nix and direnv entries
 
-**❌ STILL TODO (optional):**
-- Item #3: Refactor repetitive homeConfigurations (MEDIUM - optional)
-- Item #5: Add platform notes to test documentation (LOW)
+**❌ REMAINING TODO (low priority - optional):**
 - Various LOW priority items (nice to have, not critical)
 
 ## Quick Wins Identified
@@ -48,7 +48,7 @@ default = pkgs.mkShell {
 
 ---
 
-### 2. **Repetitive homeConfigurations in flake.nix**
+### 2. **Repetitive homeConfigurations in flake.nix** ✅ COMPLETED
 
 **Location:** `flake.nix:31-84`
 
@@ -253,7 +253,7 @@ core = {
 
 ---
 
-### 11. **Test Documentation Missing Platform Notes**
+### 11. **Test Documentation Missing Platform Notes** ✅ COMPLETED
 
 **Location:** `tests/README.md`
 

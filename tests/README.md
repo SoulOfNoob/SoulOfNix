@@ -160,6 +160,51 @@ These tests can be integrated into CI/CD pipelines:
   run: make -C tests test-alpine
 ```
 
+## Platform-Specific Notes
+
+### Arch Linux
+
+**Platform Emulation:**
+- Arch Linux Docker images are only available for `x86_64` (amd64)
+- On ARM64 hosts (Apple Silicon), Docker uses platform emulation
+- This is slower but works correctly
+- The Dockerfile explicitly specifies: `FROM --platform=linux/amd64 archlinux:latest`
+
+**Build Time:**
+- On ARM64 hosts, expect 2-3x longer build times due to emulation
+- The test itself runs normally once built
+
+### Docker Seccomp Restrictions
+
+**All Platforms:**
+- Docker's default seccomp profile blocks some syscalls that Nix sandboxing needs
+- The test script automatically disables Nix syscall filtering: `--extra-conf "filter-syscalls = false"`
+- This is **safe for testing** but wouldn't be used in production Nix installations
+- Symptom: `error: unable to load seccomp BPF program: Invalid argument`
+
+**Why This Happens:**
+- Nix's build sandbox uses syscalls that Docker restricts
+- Platform emulation (Arch on ARM64) makes this more likely
+- The workaround disables Nix's syscall filtering, not Docker's security
+
+### Alpine Linux
+
+**Locale Limitations:**
+- Alpine uses musl libc with limited locale support
+- Tests use `C.UTF-8` locale explicitly
+- Full locale packages not available/needed for tests
+
+### Slackware/UnRAID Simulation
+
+**Not a Real Slackware Container:**
+- Uses Debian base with Slackware markers (`/etc/slackware-version`)
+- Real Slackware Docker images are hard to maintain
+- Sufficient for testing SoulOfNix detection and configuration logic
+
+**UnRAID-Specific:**
+- Tests persistent history path: `/boot/config/extra/.zsh_history`
+- Creates `/boot/config` structure to simulate UnRAID environment
+
 ## Troubleshooting
 
 ### Test Failures
@@ -170,6 +215,7 @@ If tests fail:
 2. **Check flake:** Run `nix flake check` manually
 3. **Check architecture:** Verify correct profile suffix is used
 4. **Check logs:** Docker logs show detailed error messages
+5. **Rebuild images:** Run `make -C tests clean` then rebuild (may fix stale cache issues)
 
 ### Local Development
 
