@@ -17,55 +17,11 @@ RUN apt-get update && apt-get install -y \
 RUN echo "14.2" > /etc/slackware-version && \
     mkdir -p /boot/config/extra
 
-# Test as root (common on UnRAID)
-WORKDIR /root
-
-# Copy SoulOfNix files
+# Copy SoulOfNix files (runs as root, typical for UnRAID)
 COPY . /root/SoulOfNix/
 
-# Test script
-RUN echo '#!/bin/bash' > /root/test.sh && \
-    echo 'set -e' >> /root/test.sh && \
-    echo 'echo "Testing SoulOfNix on Slackware/UnRAID (simulated)..."' >> /root/test.sh && \
-    echo '' >> /root/test.sh && \
-    echo '# Verify Slackware detection' >> /root/test.sh && \
-    echo 'test -f /etc/slackware-version && echo "SUCCESS: Slackware version file exists"' >> /root/test.sh && \
-    echo '' >> /root/test.sh && \
-    echo '# Detect architecture' >> /root/test.sh && \
-    echo 'ARCH=$(uname -m)' >> /root/test.sh && \
-    echo 'if [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then' >> /root/test.sh && \
-    echo '  PROFILE_SUFFIX="-aarch64"' >> /root/test.sh && \
-    echo 'else' >> /root/test.sh && \
-    echo '  PROFILE_SUFFIX=""' >> /root/test.sh && \
-    echo 'fi' >> /root/test.sh && \
-    echo 'echo "Architecture: $ARCH, Profile suffix: $PROFILE_SUFFIX"' >> /root/test.sh && \
-    echo '' >> /root/test.sh && \
-    echo '# Install Nix (no systemd in Docker)' >> /root/test.sh && \
-    echo 'curl --proto "=https" --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install linux --no-confirm --init none' >> /root/test.sh && \
-    echo '' >> /root/test.sh && \
-    echo '# Start nix-daemon manually (no init system in Docker)' >> /root/test.sh && \
-    echo '/nix/var/nix/profiles/default/bin/nix-daemon &' >> /root/test.sh && \
-    echo 'sleep 2' >> /root/test.sh && \
-    echo '' >> /root/test.sh && \
-    echo '# Source nix profile and set USER' >> /root/test.sh && \
-    echo 'export USER=$(whoami)' >> /root/test.sh && \
-    echo '. /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' >> /root/test.sh && \
-    echo '' >> /root/test.sh && \
-    echo '# Check flake' >> /root/test.sh && \
-    echo 'cd /root/SoulOfNix' >> /root/test.sh && \
-    echo 'nix flake check --no-build' >> /root/test.sh && \
-    echo '' >> /root/test.sh && \
-    echo '# Apply remote profile with correct architecture' >> /root/test.sh && \
-    echo 'nix run home-manager -- switch --flake ".#remote${PROFILE_SUFFIX}" --impure' >> /root/test.sh && \
-    echo '' >> /root/test.sh && \
-    echo '# Verify ZSH is configured' >> /root/test.sh && \
-    echo 'test -f ~/.config/zsh/.zshrc && echo "SUCCESS: .zshrc exists"' >> /root/test.sh && \
-    echo 'test -f ~/.config/tmux/tmux.conf && echo "SUCCESS: tmux.conf exists"' >> /root/test.sh && \
-    echo '' >> /root/test.sh && \
-    echo '# Verify persistent history location is set in config' >> /root/test.sh && \
-    echo 'grep -q "boot/config" ~/.config/zsh/.zshrc && echo "SUCCESS: UnRAID history path configured"' >> /root/test.sh && \
-    echo '' >> /root/test.sh && \
-    echo 'echo "All tests passed!"' >> /root/test.sh && \
-    chmod +x /root/test.sh
+# Test as root (common on UnRAID)
+WORKDIR /root/SoulOfNix
 
-CMD ["/root/test.sh"]
+# Run test script from inside SoulOfNix directory
+CMD ["./tests/test-install.sh"]

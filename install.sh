@@ -9,6 +9,13 @@
 #
 set -euo pipefail
 
+# Get script directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Source shared installation library
+# shellcheck source=lib/install-common.sh
+source "${SCRIPT_DIR}/lib/install-common.sh"
+
 # Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -39,63 +46,8 @@ EOF
     echo -e "${NC}"
 }
 
-# Detect operating system
-detect_os() {
-    local os=""
-    local platform=""
-
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        os="macos"
-        platform="darwin"
-    elif [[ -f /etc/alpine-release ]]; then
-        os="alpine"
-        platform="alpine"
-    elif [[ -f /etc/unraid-version ]] || [[ -f /etc/slackware-version ]]; then
-        os="slackware"
-        platform="slackware"
-    elif [[ -f /etc/arch-release ]]; then
-        os="arch"
-        platform="linux-systemd"
-    elif [[ -f /etc/debian_version ]]; then
-        os="debian"
-        platform="linux-systemd"
-    elif [[ -f /etc/redhat-release ]]; then
-        os="redhat"
-        platform="linux-systemd"
-    elif [[ -f /etc/os-release ]]; then
-        os=$(grep -oP '(?<=^ID=).+' /etc/os-release | tr -d '"')
-        platform="linux-systemd"
-    else
-        os="unknown"
-        platform="linux-systemd"
-    fi
-
-    echo "$os:$platform"
-}
-
-# Detect architecture
-detect_arch() {
-    local arch
-    arch=$(uname -m)
-
-    case "$arch" in
-        x86_64|amd64)
-            echo "x86_64"
-            ;;
-        aarch64|arm64)
-            echo "aarch64"
-            ;;
-        *)
-            log_error "Unsupported architecture: $arch"
-            exit 1
-            ;;
-    esac
-}
-
-# Check if Nix is installed
-is_nix_installed() {
-    command -v nix &>/dev/null
-}
+# Note: detect_os(), detect_arch(), is_nix_installed(), is_home_manager_available(),
+# get_flake_config(), and verify_installation() are now in lib/install-common.sh
 
 # Install Nix using Determinate installer
 install_nix() {
@@ -118,21 +70,10 @@ install_nix() {
     curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | \
         sh -s -- install $install_args
 
-    # Source Nix profile
-    if [[ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]]; then
-        # shellcheck source=/dev/null
-        . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
-    elif [[ -f "$HOME/.nix-profile/etc/profile.d/nix.sh" ]]; then
-        # shellcheck source=/dev/null
-        . "$HOME/.nix-profile/etc/profile.d/nix.sh"
-    fi
+    # Source Nix profile using shared function
+    source_nix_profile
 
     log_success "Nix installed successfully"
-}
-
-# Check if home-manager is available
-is_home_manager_available() {
-    nix run home-manager -- --version &>/dev/null 2>&1
 }
 
 # Fetch GitHub public keys
@@ -225,48 +166,36 @@ run_wizard() {
     fi
 }
 
-# Build flake configuration name
-get_flake_config() {
-    local profile="$1"
-    local platform="$2"
-    local arch="$3"
-
-    # Map to flake configuration names
-    case "$platform" in
-        darwin)
-            if [[ "$arch" == "aarch64" ]]; then
-                echo "${profile}-darwin"
-            else
-                echo "${profile}-darwin-x86"
-            fi
-            ;;
-        *)
-            if [[ "$arch" == "aarch64" ]]; then
-                echo "${profile}-aarch64"
-            else
-                echo "${profile}"
-            fi
-            ;;
-    esac
-}
+# Note: get_flake_config() is now in lib/install-common.sh
 
 # Run home-manager switch
 apply_configuration() {
     local flake_config="$1"
-    local script_dir
-    script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
     log_info "Applying home-manager configuration: $flake_config"
 
     # Run home-manager switch
     nix run home-manager -- switch \
-        --flake "${script_dir}#${flake_config}" \
+        --flake "${SCRIPT_DIR}#${flake_config}" \
         --impure
 
     log_success "Configuration applied successfully!"
 
+    # Verify installation
+    echo ""
+    log_info "Verifying installation..."
+    if verify_installation; then
+        log_success "Installation verified successfully!"
+    else
+        log_error "Installation verification failed"
+        log_warn "Configuration was applied but some checks failed"
+        log_warn "Please review the errors above"
+        return 1
+    fi
+
     # Add authorized keys if provided (for remote profile)
     if [[ -n "${AUTHORIZED_KEYS:-}" ]]; then
+        echo ""
         log_info "Adding SSH authorized keys..."
         mkdir -p ~/.ssh
         chmod 700 ~/.ssh

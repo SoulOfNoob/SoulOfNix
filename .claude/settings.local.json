@@ -3,7 +3,11 @@
     "allow": [
       "WebFetch(domain:nix.dev)",
       "Bash(nix flake check:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(chmod:*)",
+      "Bash(command -v:*)",
+      "Bash(shellcheck:*)",
+      "Bash(wc:*)"
     ]
   }
 }
