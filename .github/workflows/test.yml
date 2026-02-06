@@ -1,0 +1,42 @@
+name: Tests
+
+# Manual trigger only - use "Run workflow" button in GitHub Actions tab
+on:
+  workflow_dispatch:
+
+jobs:
+  test-linux:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        platform: [debian, alpine, arch, slackware]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test ${{ matrix.platform }}
+        run: make -C tests test-${{ matrix.platform }}
+
+  test-macos:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-14, macos-13]  # ARM64, Intel
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v14
+
+      - name: Test installation
+        run: |
+          source lib/install-common.sh
+          ARCH=$(detect_arch)
+          OS=$(detect_os)
+          FLAKE_CONFIG=$(get_flake_config "remote" "$OS" "$ARCH")
+
+          echo "Testing: $FLAKE_CONFIG"
+          nix run nixpkgs#home-manager -- switch --flake .#${FLAKE_CONFIG} --impure
+
+      - name: Verify
+        run: |
+          source lib/install-common.sh
+          verify_installation

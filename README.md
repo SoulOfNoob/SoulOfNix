@@ -224,6 +224,7 @@ See [DEVELOPMENT.md](DEVELOPMENT.md) for implementation notes, gotchas, and less
 - **[NIX_BEST_PRACTICES.md](NIX_BEST_PRACTICES.md)** - Comprehensive Nix best practices guide
 - **[DEVELOPMENT.md](DEVELOPMENT.md)** - Implementation notes and lessons learned
 - **[MIGRATION.md](MIGRATION.md)** - Migration guide from other setups
+- **[.github/TESTING.md](.github/TESTING.md)** - GitHub Actions testing guide
 
 ## License
 
