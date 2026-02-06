@@ -23,21 +23,22 @@ jobs:
     strategy:
       matrix:
         os: [macos-14, macos-15]  # Sonoma, Sequoia
+        profile: [local, work]
     steps:
       - uses: actions/checkout@v4
 
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v14
 
-      - name: Test installation
+      - name: Test ${{ matrix.profile }} profile
         run: |
           source lib/install-common.sh
           ARCH=$(detect_arch)
           OS=$(detect_os)
           PLATFORM="${OS#*:}"  # Extract platform from "os:platform"
-          FLAKE_CONFIG=$(get_flake_config "local" "$PLATFORM" "$ARCH")
+          FLAKE_CONFIG=$(get_flake_config "${{ matrix.profile }}" "$PLATFORM" "$ARCH")
 
-          echo "Testing: $FLAKE_CONFIG (OS: $OS, Arch: $ARCH)"
+          echo "Testing: $FLAKE_CONFIG (Profile: ${{ matrix.profile }}, OS: $OS, Arch: $ARCH)"
           nix run nixpkgs#home-manager -- switch --flake .#${FLAKE_CONFIG} --impure
 
       - name: Verify

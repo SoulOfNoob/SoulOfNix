@@ -59,10 +59,7 @@
   };
 
   # Git with delta for better diffs
-  programs.git.delta = {
-    enable = true;
-    enableGitIntegration = true;
-  };
+  programs.delta.enable = true;
 
   # FZF configuration
   programs.fzf = {
