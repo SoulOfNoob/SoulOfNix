@@ -66,7 +66,7 @@
 
   # Git configuration for macOS
   programs.git = {
-    extraConfig = {
+    settings = {
       credential = {
         # Use macOS Keychain for credentials
         helper = "osxkeychain";

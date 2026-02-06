@@ -10,8 +10,8 @@
     # userName = "Your Name";  # Set in profile or extraConfig
     # userEmail = "you@example.com";  # Set in profile or extraConfig
 
-    # Core settings
-    extraConfig = {
+    # Core settings (using new 'settings' option name)
+    settings = {
       core = {
         # Default editor - can be overridden per profile
         editor = lib.mkDefault "nano";
@@ -58,8 +58,8 @@
       color = lib.genAttrs [ "ui" "branch" "diff" "status" ] (_: "auto");
     };
 
-    # Git aliases
-    aliases = {
+    # Git aliases (using new 'settings.alias' option name)
+    settings.alias = {
       st = "status";
       co = "checkout";
       br = "branch";
@@ -73,16 +73,6 @@
       wip = "!git add -A && git commit -m 'WIP'";
     };
 
-    # Delta for better diffs (optional, can be enabled per profile)
-    delta = {
-      enable = lib.mkDefault false;
-      options = {
-        navigate = true;
-        light = false;
-        side-by-side = true;
-        line-numbers = true;
-      };
-    };
 
     # Ignore patterns
     ignores = [
@@ -111,5 +101,16 @@
       "build/"
       "*.log"
     ];
+  };
+
+  # Delta for better diffs (optional, can be enabled per profile)
+  programs.delta = {
+    enable = lib.mkDefault false;
+    options = {
+      navigate = true;
+      light = false;
+      side-by-side = true;
+      line-numbers = true;
+    };
   };
 }

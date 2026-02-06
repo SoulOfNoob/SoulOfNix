@@ -13,10 +13,11 @@ jobs:
     strategy:
       matrix:
         platform: [debian, alpine, arch, slackware]
+        profile: [remote, local]
     steps:
       - uses: actions/checkout@v4
-      - name: Test ${{ matrix.platform }}
-        run: make -C tests test-${{ matrix.platform }}
+      - name: Test ${{ matrix.platform }} with ${{ matrix.profile }} profile
+        run: TEST_PROFILE=${{ matrix.profile }} make -C tests test-${{ matrix.platform }}
 
   test-macos:
     runs-on: ${{ matrix.os }}

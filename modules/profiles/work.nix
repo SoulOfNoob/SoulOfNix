@@ -13,7 +13,7 @@
     pkgs.awscli2
 
     # Database tools
-    pkgs.mysql-client
+    pkgs.mariadb.client  # Replaced mysql-client
     pkgs.postgresql
 
     # PHP development (if needed)
@@ -57,7 +57,7 @@
     # Work email - override this in your local config
     # userEmail = "your.email@company.com";
 
-    extraConfig = {
+    settings = {
       # Sign commits if using GPG
       # commit.gpgsign = true;
 

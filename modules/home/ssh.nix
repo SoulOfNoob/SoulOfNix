@@ -31,8 +31,7 @@ in
       };
     };
 
-    # Known hosts file
-    userKnownHostsFile = "~/.ssh/known_hosts";
+    # userKnownHostsFile is now per-matchBlock, using default ~/.ssh/known_hosts
   };
 
   # Note: SSH sockets directory will be created automatically by ControlPath on first use
