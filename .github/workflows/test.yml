@@ -34,9 +34,10 @@ jobs:
           source lib/install-common.sh
           ARCH=$(detect_arch)
           OS=$(detect_os)
-          FLAKE_CONFIG=$(get_flake_config "local" "$OS" "$ARCH")
+          PLATFORM="${OS#*:}"  # Extract platform from "os:platform"
+          FLAKE_CONFIG=$(get_flake_config "local" "$PLATFORM" "$ARCH")
 
-          echo "Testing: $FLAKE_CONFIG"
+          echo "Testing: $FLAKE_CONFIG (OS: $OS, Arch: $ARCH)"
           nix run nixpkgs#home-manager -- switch --flake .#${FLAKE_CONFIG} --impure
 
       - name: Verify
