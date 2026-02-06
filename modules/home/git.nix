@@ -13,7 +13,8 @@
     # Core settings
     extraConfig = {
       core = {
-        editor = "nano";
+        # Default editor - can be overridden per profile
+        editor = lib.mkDefault "nano";
         autocrlf = "input";
         whitespace = "trailing-space,space-before-tab";
       };
@@ -53,13 +54,8 @@
       # Remember merge conflict resolutions
       rerere.enabled = true;
 
-      # Color settings
-      color = {
-        ui = "auto";
-        branch = "auto";
-        diff = "auto";
-        status = "auto";
-      };
+      # Color settings - enable auto coloring for all components
+      color = lib.genAttrs [ "ui" "branch" "diff" "status" ] (_: "auto");
     };
 
     # Git aliases

@@ -128,17 +128,43 @@ SoulOfNix/
 
 ## Testing
 
+### Local Testing (Docker)
+
 ```bash
-# Run all Docker tests
+# Run all Docker tests (Linux platforms)
 make -C tests test
 
 # Test specific platform
 make -C tests test-alpine
 make -C tests test-debian
+make -C tests test-arch
+make -C tests test-slackware
+
+# Quick syntax check (no Nix installation)
+make -C tests test-syntax
+
+# Test shared library functions
+make -C tests test-lib
 
 # Validate flake
 nix flake check
 ```
+
+### GitHub Actions (macOS + Linux)
+
+Manual testing workflow available for comprehensive cross-platform testing:
+
+1. Go to **Actions** tab in GitHub
+2. Select **"SoulOfNix Tests"** workflow
+3. Click **"Run workflow"** button
+4. Choose which tests to run:
+   - ✅ **Linux Docker tests** (Debian, Alpine, Arch, Slackware)
+   - ✅ **macOS tests** (Apple Silicon + Intel)
+
+**Platforms tested:**
+- Linux: Debian, Alpine, Arch, Slackware (Docker)
+- macOS: Apple Silicon (M1/M2), Intel (x86_64)
+- Total: 6 platforms tested automatically
 
 ## Updating
 

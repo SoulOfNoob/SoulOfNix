@@ -3,6 +3,16 @@
 # SoulOfNix Common Installation Library
 # Shared functions used by install.sh and test scripts
 #
+# Exported functions:
+#   detect_arch()                - Detect and normalize architecture (x86_64/aarch64)
+#   detect_os()                  - Detect OS and platform (returns: os:platform format)
+#   get_flake_config()           - Build flake configuration name from profile/platform/arch
+#   verify_installation()        - Verify home-manager installation succeeded
+#   is_nix_installed()           - Check if Nix is installed
+#   is_home_manager_available()  - Check if home-manager command is available
+#   source_nix_profile()         - Source Nix environment (multi-user or single-user)
+#   get_script_dir()             - Get directory containing the calling script
+#
 
 # Detect architecture (normalized to x86_64 or aarch64)
 detect_arch() {

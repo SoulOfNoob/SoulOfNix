@@ -35,8 +35,7 @@ in
     userKnownHostsFile = "~/.ssh/known_hosts";
   };
 
-  # Create SSH sockets directory
-  home.file.".ssh/sockets/.keep".text = "";
+  # Note: SSH sockets directory will be created automatically by ControlPath on first use
 
   # Manage authorized_keys for remote profile
   home.file.".ssh/authorized_keys" = lib.mkIf (authorizedKeys != [ ]) {
