@@ -1,11 +1,24 @@
 # Low-Hanging Fruit Optimizations
 
 **Date:** 2026-02-06
-**Status:** Identified and Ready to Implement
+**Status:** HIGH Priority Items ✅ Complete, MEDIUM Partially Complete, LOW Optional
+
+## Completion Status Update
+
+**✅ COMPLETED:**
+- Item #1: Fixed `with pkgs;` in flake.nix devShells
+- Item #2: Added LICENSE file (MIT License)
+- Item #6: Updated .gitignore with Nix and direnv entries
+- Item #4 (partial): Platform duplication eliminated via hierarchical inheritance (base.nix → linux-base.nix → specific platforms)
+
+**❌ STILL TODO (optional):**
+- Item #3: Refactor repetitive homeConfigurations (MEDIUM - optional)
+- Item #5: Add platform notes to test documentation (LOW)
+- Various LOW priority items (nice to have, not critical)
 
 ## Quick Wins Identified
 
-### 1. **CRITICAL: Missed `with pkgs;` in flake.nix** ⚠️
+### 1. **CRITICAL: Missed `with pkgs;` in flake.nix** ✅ COMPLETED
 
 **Location:** `flake.nix:93-96`
 
@@ -139,7 +152,7 @@ home.file.".ssh/sockets/.keep".text = "";
 
 ---
 
-### 6. **Missing `.gitignore` Entries**
+### 6. **Missing `.gitignore` Entries** ✅ COMPLETED
 
 **Location:** `.gitignore`
 
@@ -200,28 +213,19 @@ core = {
 
 ---
 
-### 8. **ZSH Aliases Could Use `lib.optionalAttrs`**
+### 8. **ZSH Aliases Could Use `lib.optionalAttrs`** ✅ PARTIALLY ADDRESSED
 
 **Location:** `modules/home/zsh.nix:52-89`
 
 **Current:** All aliases defined for all platforms
 
-**Potential optimization:** Platform-specific aliases
-```nix
-shellAliases = lib.mapAttrs (name: lib.mkDefault) ({
-  # Common aliases
-  ".." = "cd ..";
-  # ...
-} // lib.optionalAttrs isDarwin {
-  # macOS-specific aliases (moved from darwin.nix)
-} // lib.optionalAttrs isLinux {
-  # Linux-specific aliases
-});
-```
+**Status:** Platform-specific configuration now handled via hierarchical inheritance (base.nix → linux-base.nix → platform-specific). Platform-specific aliases already moved to platform files.
 
-**Impact:** Medium (cleaner organization)
+**Note:** Could further optimize by using lib.optionalAttrs, but hierarchical inheritance already provides good separation.
+
+**Impact:** Low (already well-organized via inheritance)
 **Effort:** 10 minutes
-**Priority:** MEDIUM
+**Priority:** LOW (optional refinement)
 
 ---
 
@@ -352,7 +356,7 @@ rebuild-all:
 
 ---
 
-### 15. **Missing LICENSE File**
+### 15. **Missing LICENSE File** ✅ COMPLETED
 
 **Location:** Project root
 

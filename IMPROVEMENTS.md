@@ -262,8 +262,9 @@ home-manager switch --flake .#remote --impure
 ## 📝 Files Modified
 
 ### Summary
-- **13 Nix files** modified
-- **2 new documentation files** added
+- **15 Nix files** modified
+- **2 Nix files** created
+- **6 documentation files** added
 
 ### Complete List
 
@@ -278,15 +279,35 @@ M modules/platforms/alpine.nix
 M modules/platforms/darwin.nix
 M modules/platforms/linux-systemd.nix
 M modules/platforms/slackware.nix
+A modules/platforms/base.nix          (NEW - common to all platforms)
+A modules/platforms/linux-base.nix    (NEW - common to all Linux)
 M modules/profiles/local.nix
 M modules/profiles/remote.nix
 M modules/profiles/work.nix
+M flake.nix
+M .gitignore
+```
+
+**Shared Code:**
+```
+A lib/install-common.sh               (Shared installation functions)
+M install.sh
+A tests/test-install.sh               (Unified test script)
+M tests/docker/Dockerfile.alpine
+M tests/docker/Dockerfile.arch
+M tests/docker/Dockerfile.debian
+M tests/docker/Dockerfile.slackware
 ```
 
 **Documentation Files:**
 ```
-A NIX_BEST_PRACTICES.md    (Comprehensive Nix best practices guide)
-A IMPROVEMENTS.md           (This file)
+A NIX_BEST_PRACTICES.md               (Comprehensive Nix best practices guide)
+A IMPROVEMENTS.md                     (This file)
+A OPTIMIZATIONS.md                    (Low-hanging fruit optimizations)
+A SHARED_CODE_ANALYSIS.md             (Shared code duplication analysis)
+A REFACTORING_SUMMARY.md              (Complete refactoring summary)
+A tests/README.md                     (Test documentation)
+A tests/REFACTORING.md                (Test refactoring details)
 ```
 
 ---
@@ -328,6 +349,68 @@ These improvements were made possible by:
 - Official Nix documentation at nix.dev
 - Nix community best practices
 - Home Manager documentation and community
+
+---
+
+### 6. Platform Configuration Duplication Elimination
+
+**Files Created:**
+- `modules/platforms/base.nix` (NEW) - Common to all platforms
+- `modules/platforms/linux-base.nix` (NEW) - Common to all Linux platforms
+
+**Files Refactored:**
+- `modules/platforms/darwin.nix` - Imports base.nix
+- `modules/platforms/linux-systemd.nix` - Imports linux-base.nix
+- `modules/platforms/alpine.nix` - Imports linux-base.nix
+- `modules/platforms/slackware.nix` - Imports linux-base.nix
+
+**Change:** Created hierarchical inheritance structure for platform modules.
+
+**Inheritance Structure:**
+```
+base.nix (all platforms)
+├── darwin.nix (macOS-specific)
+└── linux-base.nix (all Linux platforms)
+    ├── linux-systemd.nix (systemd-specific)
+    ├── alpine.nix (Alpine/OpenRC-specific)
+    └── slackware.nix (Slackware/UnRAID-specific)
+```
+
+**Before:**
+```nix
+# Repeated in 4 platform files:
+programs.zsh.oh-my-zsh.plugins = [ "git" "node" "npm" "docker" "github" "vscode" "yarn" ];
+
+# Repeated in 3 Linux platform files:
+programs.zsh.oh-my-zsh.plugins = [ "ssh-agent" ];
+home.packages = [ pkgs.procps pkgs.coreutils ];
+# SSH agent configuration repeated 3 times
+```
+
+**After:**
+```nix
+# In base.nix (inherited by all):
+programs.zsh.oh-my-zsh.plugins = lib.mkDefault [ "git" "node" "npm" "docker" "github" "vscode" "yarn" ];
+
+# In linux-base.nix (inherited by all Linux):
+imports = [ ./base.nix ];
+programs.zsh.oh-my-zsh.plugins = lib.mkAfter [ "ssh-agent" ];
+home.packages = [ pkgs.procps pkgs.coreutils ];
+# SSH agent configuration once
+
+# In platform files (only platform-specific additions):
+imports = [ ./linux-base.nix ];  # or ./base.nix for darwin
+programs.zsh.oh-my-zsh.plugins = lib.mkAfter [ "systemd" ];  # systemd only
+```
+
+**Benefits:**
+- ✅ Zero duplication across platform files
+- ✅ Clear separation of concerns (base → linux → specific)
+- ✅ Each platform file only contains truly platform-specific configuration
+- ✅ Easy to add new platforms (just import appropriate base)
+- ✅ Changes to common config applied everywhere automatically
+
+**Rationale:** Maintains one file with common packages, platform-specific packages explicitly set per platform. Uses lib.mkAfter for layered configuration, allowing platform-specific additions without conflicts.
 
 ---
 

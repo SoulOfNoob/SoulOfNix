@@ -38,7 +38,7 @@ Before migrating, document any customizations:
 
 ```bash
 # Clone SoulOfNix
-git clone https://github.com/jappyjan/SoulOfNix.git
+git clone https://github.com/SoulOfNoob/SoulOfNix.git
 cd SoulOfNix
 
 # Run installer

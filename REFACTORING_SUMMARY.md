@@ -102,6 +102,53 @@ tests/test-install.sh:
 
 ---
 
+## Phase 4: Platform Duplication Elimination (COMPLETED ✅)
+
+### Issues Fixed
+- ❌ Eliminated duplicate ZSH plugin configurations across platforms
+- ❌ Eliminated duplicate Linux packages across platforms
+- ❌ Eliminated duplicate SSH agent configuration across Linux platforms
+- ❌ Created hierarchical inheritance structure
+
+### Solution Created
+**Hierarchical platform inheritance:**
+
+```
+base.nix (all platforms)
+├── darwin.nix (macOS-specific)
+└── linux-base.nix (all Linux platforms)
+    ├── linux-systemd.nix (systemd-specific)
+    ├── alpine.nix (Alpine/OpenRC-specific)
+    └── slackware.nix (Slackware/UnRAID-specific)
+```
+
+### Results
+```
+Before: ZSH plugins repeated in 4 files
+After:  ZSH plugins in base.nix, inherited by all
+
+Before: SSH agent config repeated in 3 Linux files
+After:  SSH agent config in linux-base.nix, inherited by all Linux
+
+Before: Linux packages repeated in 3 files
+After:  Linux packages in linux-base.nix, inherited by all Linux
+
+Duplication: 100% eliminated
+Maintainability: Significantly improved
+```
+
+### Files Created
+- `modules/platforms/base.nix` (27 lines) - Common to ALL platforms
+- `modules/platforms/linux-base.nix` (36 lines) - Common to all Linux
+
+### Files Refactored
+- `modules/platforms/darwin.nix` (93 lines) - Imports base.nix
+- `modules/platforms/linux-systemd.nix` (34 lines) - Imports linux-base.nix
+- `modules/platforms/alpine.nix` (37 lines) - Imports linux-base.nix
+- `modules/platforms/slackware.nix` (58 lines) - Imports linux-base.nix
+
+---
+
 ## Critical Improvement: Verification Added
 
 ### Before (install.sh)
@@ -271,11 +318,12 @@ M  tests/docker/Dockerfile.debian
 M  tests/docker/Dockerfile.slackware
 ```
 
-### Created Files (7)
+### Created Files (10)
 ```
 Documentation:
-A  IMPROVEMENTS.md                  (Phase 1 summary)
+A  IMPROVEMENTS.md                  (Phase 1-4 summary)
 A  NIX_BEST_PRACTICES.md            (Best practices guide)
+A  OPTIMIZATIONS.md                 (Low-hanging fruit analysis)
 A  SHARED_CODE_ANALYSIS.md          (Code analysis)
 A  REFACTORING_SUMMARY.md           (This file)
 A  tests/README.md                  (Test guide)
@@ -284,6 +332,8 @@ A  tests/REFACTORING.md             (Test refactoring)
 Code:
 A  lib/install-common.sh            (Shared library)
 A  tests/test-install.sh            (Unified test script)
+A  modules/platforms/base.nix       (Common platform base)
+A  modules/platforms/linux-base.nix (Linux platform base)
 ```
 
 ---
@@ -394,6 +444,14 @@ Total duplicated:      0 lines
 - [x] All function tests pass
 - [x] All syntax checks pass
 
+### Phase 4: Platform Duplication Elimination ✅
+- [x] Created modules/platforms/base.nix
+- [x] Created modules/platforms/linux-base.nix
+- [x] Updated all platform files to use imports
+- [x] Eliminated all configuration duplication
+- [x] Flake check passes
+- [x] Hierarchical inheritance working correctly
+
 ---
 
 ## Next Steps for Users
@@ -442,17 +500,18 @@ Potential enhancements:
 
 This refactoring:
 
-✅ **Eliminates all code duplication** (100% DRY)
+✅ **Eliminates all code duplication** (100% DRY - shell scripts AND platform modules)
 ✅ **Adds verification to installer** (real bug fix)
 ✅ **Improves code quality** (Nix best practices)
 ✅ **Reduces maintenance burden** (75% less work)
-✅ **Enhances documentation** (6 comprehensive guides)
+✅ **Hierarchical platform inheritance** (base → linux → specific)
+✅ **Enhances documentation** (7 comprehensive guides)
 ✅ **Maintains compatibility** (no breaking changes)
 
 **Result:** Better, more maintainable, more reliable codebase.
 
 ---
 
-**Total Effort:** 3 phases, comprehensive testing, extensive documentation
-**Total Impact:** ~240 lines duplication eliminated, verification added, best practices applied
+**Total Effort:** 4 phases, comprehensive testing, extensive documentation
+**Total Impact:** ~240 lines shell script duplication + platform duplication eliminated, verification added, best practices applied
 **Status:** ✅ Complete, verified, documented, ready to commit

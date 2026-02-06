@@ -6,7 +6,7 @@ Nix-based ZSH environment manager using home-manager. Provides a reproducible, d
 
 ```bash
 # Clone the repository
-git clone https://github.com/jappyjan/SoulOfNix.git
+git clone https://github.com/SoulOfNoob/SoulOfNix.git
 cd SoulOfNix
 
 # Run the interactive installer
@@ -111,11 +111,13 @@ SoulOfNix/
 │   │   ├── remote.nix
 │   │   ├── local.nix
 │   │   └── work.nix
-│   └── platforms/            # Platform-specific
-│       ├── darwin.nix
-│       ├── linux-systemd.nix
-│       ├── alpine.nix
-│       └── slackware.nix
+│   └── platforms/            # Platform-specific (hierarchical)
+│       ├── base.nix          # Common to all platforms
+│       ├── darwin.nix        # macOS-specific
+│       ├── linux-base.nix    # Common to all Linux
+│       ├── linux-systemd.nix # Systemd-based Linux
+│       ├── alpine.nix        # Alpine/OpenRC
+│       └── slackware.nix     # Slackware/UnRAID
 ├── config/
 │   └── p10k/
 │       └── base.zsh          # PowerLevel10k theme
@@ -191,7 +193,8 @@ See [DEVELOPMENT.md](DEVELOPMENT.md) for implementation notes, gotchas, and less
 
 ## Documentation
 
-- **[IMPROVEMENTS.md](IMPROVEMENTS.md)** - Recent code improvements and refactoring summary
+- **[IMPROVEMENTS.md](IMPROVEMENTS.md)** - Complete refactoring history and improvements
+- **[OPTIMIZATIONS.md](OPTIMIZATIONS.md)** - Low-hanging fruit optimizations
 - **[NIX_BEST_PRACTICES.md](NIX_BEST_PRACTICES.md)** - Comprehensive Nix best practices guide
 - **[DEVELOPMENT.md](DEVELOPMENT.md)** - Implementation notes and lessons learned
 - **[MIGRATION.md](MIGRATION.md)** - Migration guide from other setups

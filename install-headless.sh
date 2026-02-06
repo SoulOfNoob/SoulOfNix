@@ -11,7 +11,7 @@
 #   SKIP_SHELL_CHANGE - Skip changing default shell if set to "1"
 #
 # Usage:
-#   NIX_ZSH_PROFILE=remote GITHUB_USER=jappyjan ./install-headless.sh
+#   NIX_ZSH_PROFILE=remote GITHUB_USER=SoulOfNoob ./install-headless.sh
 #
 set -euo pipefail
 
