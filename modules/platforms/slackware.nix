@@ -3,35 +3,14 @@
 { config, lib, pkgs, ... }:
 
 {
-  # Minimal additional packages
-  home.packages = [
-    # Basic utilities
-    pkgs.procps
-    pkgs.coreutils
-  ];
+  imports = [ ./linux-base.nix ];
 
-  # ZSH configuration for Slackware/UnRAID
+  # No additional packages needed (inherits procps, coreutils from linux-base)
+
+  # Slackware-specific ZSH configuration
   programs.zsh = {
-    oh-my-zsh.plugins = [
-      "git"
-      "node"
-      "npm"
-      "docker" # Docker is common on UnRAID
-      "github"
-      "yarn"
-      "ssh-agent"
-      # No systemd - Slackware uses SysV init
-    ];
-
     initContent = lib.mkAfter ''
-      # Slackware / UnRAID specific settings
-
-      # SSH agent configuration
-      zstyle :omz:plugins:ssh-agent agent-forwarding on
-      zstyle :omz:plugins:ssh-agent ssh-add-args -q
-      zstyle :omz:plugins:ssh-agent identities id_rsa id_ed25519
-
-      # Nix single-user mode - ensure profile is sourced
+      # Slackware-specific: Nix single-user mode
       if [ -f "$HOME/.nix-profile/etc/profile.d/nix.sh" ]; then
         . "$HOME/.nix-profile/etc/profile.d/nix.sh"
       fi
@@ -66,10 +45,7 @@
   };
 
   # XDG directories (minimal for Slackware)
-  xdg = {
-    enable = true;
-    userDirs.enable = lib.mkDefault false;
-  };
+  xdg.userDirs.enable = lib.mkDefault false;
 
   # Special activation for UnRAID persistent storage
   home.activation.unraidPersistence = lib.hm.dag.entryAfter [ "writeBoundary" ] ''

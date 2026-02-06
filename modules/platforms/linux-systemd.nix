@@ -2,36 +2,22 @@
 { config, lib, pkgs, ... }:
 
 {
-  # Linux-specific packages
+  imports = [ ./linux-base.nix ];
+
+  # Additional systemd-specific packages
   home.packages = [
-    # System utilities
-    pkgs.procps # ps, top, etc.
-    pkgs.util-linux # Various Linux utilities
+    pkgs.util-linux    # Linux utilities (systemd-specific tools)
   ];
 
-  # ZSH configuration for Linux
+  # Systemd-specific ZSH configuration
   programs.zsh = {
-    oh-my-zsh.plugins = [
-      "git"
-      "node"
-      "npm"
-      "docker"
-      "github"
-      "vscode"
-      "yarn"
-      "ssh-agent" # Linux uses ssh-agent plugin
-      "systemd" # Systemd shortcuts
+    # Add systemd plugin
+    oh-my-zsh.plugins = lib.mkAfter [
+      "systemd"      # Systemd shortcuts
     ];
 
     initContent = lib.mkAfter ''
-      # Linux-specific settings
-
-      # SSH agent configuration
-      zstyle :omz:plugins:ssh-agent agent-forwarding on
-      zstyle :omz:plugins:ssh-agent ssh-add-args -q
-      zstyle :omz:plugins:ssh-agent identities id_rsa id_ed25519
-
-      # Systemd aliases are provided by the plugin, but add more
+      # Systemd-specific aliases
       alias jctl="journalctl"
       alias jctlu="journalctl --user"
       alias sctl="systemctl"
@@ -39,15 +25,9 @@
     '';
   };
 
-  # Systemd user services (if you want home-manager to manage any)
-  # systemd.user.services = { };
-
-  # XDG directories
-  xdg = {
+  # XDG user directories (full support on systemd systems)
+  xdg.userDirs = {
     enable = true;
-    userDirs = {
-      enable = true;
-      createDirectories = true;
-    };
+    createDirectories = true;
   };
 }

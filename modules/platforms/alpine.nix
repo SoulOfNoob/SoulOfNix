@@ -3,35 +3,14 @@
 { config, lib, pkgs, ... }:
 
 {
-  # Alpine-specific packages
-  home.packages = [
-    # Basic utilities that might not be present
-    pkgs.procps
-    pkgs.coreutils
-  ];
+  imports = [ ./linux-base.nix ];
 
-  # ZSH configuration for Alpine
+  # No additional packages needed (inherits procps, coreutils from linux-base)
+
+  # Alpine-specific ZSH configuration
   programs.zsh = {
-    oh-my-zsh.plugins = [
-      "git"
-      "node"
-      "npm"
-      "docker"
-      "github"
-      "yarn"
-      "ssh-agent"
-      # No systemd plugin - Alpine uses OpenRC
-    ];
-
     initContent = lib.mkAfter ''
-      # Alpine Linux specific settings
-
-      # SSH agent configuration
-      zstyle :omz:plugins:ssh-agent agent-forwarding on
-      zstyle :omz:plugins:ssh-agent ssh-add-args -q
-      zstyle :omz:plugins:ssh-agent identities id_rsa id_ed25519
-
-      # Set locale if not set (Alpine often doesn't have full locale support)
+      # Alpine-specific: Set locale (Alpine often doesn't have full locale support)
       export LANG="''${LANG:-C.UTF-8}"
       export LC_ALL="''${LC_ALL:-C.UTF-8}"
 
@@ -53,8 +32,5 @@
   };
 
   # XDG directories (simpler setup for Alpine)
-  xdg = {
-    enable = true;
-    userDirs.enable = lib.mkDefault false; # Alpine might not have xdg-user-dirs
-  };
+  xdg.userDirs.enable = lib.mkDefault false;  # Alpine might not have xdg-user-dirs
 }

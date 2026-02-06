@@ -2,27 +2,21 @@
 { config, lib, pkgs, ... }:
 
 {
-  # macOS-specific packages
+  imports = [ ./base.nix ];
+
+  # macOS-specific packages (GNU tools)
   home.packages = [
-    # macOS utilities
-    pkgs.coreutils # GNU coreutils (prefixed with 'g')
-    pkgs.gnused # GNU sed
-    pkgs.gnugrep # GNU grep
+    pkgs.coreutils      # GNU coreutils (prefixed with 'g')
+    pkgs.gnused         # GNU sed
+    pkgs.gnugrep        # GNU grep
   ];
 
-  # ZSH adjustments for macOS
+  # macOS-specific ZSH configuration
   programs.zsh = {
-    # macOS uses 1Password SSH agent, not zsh ssh-agent plugin
-    oh-my-zsh.plugins = lib.mkForce [
-      "git"
-      "node"
-      "npm"
-      "docker"
-      "github"
-      "vscode"
-      "yarn"
-      "macos" # macOS-specific plugin
-      "brew" # Homebrew integration
+    # Add macOS-specific plugins to base plugins
+    oh-my-zsh.plugins = lib.mkAfter [
+      "macos"        # macOS-specific plugin
+      "brew"         # Homebrew integration
     ];
 
     initContent = lib.mkAfter ''
@@ -69,8 +63,6 @@
       ls = "ls --color=auto";
     };
   };
-
-  # SSH configuration for macOS with 1Password is in modules/home/ssh.nix
 
   # Git configuration for macOS
   programs.git = {
