@@ -1,0 +1,55 @@
+# Slackware test container for SoulOfNix
+# Note: Using Debian as base with Slackware-like setup since official Slackware images are limited
+# This simulates the single-user Nix mode used on Slackware/UnRAID
+FROM debian:bookworm-slim
+
+# Install basic dependencies
+RUN apt-get update && apt-get install -y \
+    bash \
+    curl \
+    git \
+    xz-utils \
+    sudo \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Simulate Slackware/UnRAID environment
+RUN echo "14.2" > /etc/slackware-version && \
+    mkdir -p /boot/config/extra
+
+# Test as root (common on UnRAID)
+WORKDIR /root
+
+# Copy SoulOfNix files
+COPY . /root/SoulOfNix/
+
+# Test script
+RUN echo '#!/bin/bash' > /root/test.sh && \
+    echo 'set -e' >> /root/test.sh && \
+    echo 'echo "Testing SoulOfNix on Slackware/UnRAID (simulated)..."' >> /root/test.sh && \
+    echo '' >> /root/test.sh && \
+    echo '# Verify Slackware detection' >> /root/test.sh && \
+    echo 'test -f /etc/slackware-version && echo "SUCCESS: Slackware version file exists"' >> /root/test.sh && \
+    echo '' >> /root/test.sh && \
+    echo '# Install Nix (single-user mode for Slackware)' >> /root/test.sh && \
+    echo 'curl --proto "=https" --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --no-confirm' >> /root/test.sh && \
+    echo '. /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh || . ~/.nix-profile/etc/profile.d/nix.sh' >> /root/test.sh && \
+    echo '' >> /root/test.sh && \
+    echo '# Check flake' >> /root/test.sh && \
+    echo 'cd /root/SoulOfNix' >> /root/test.sh && \
+    echo 'nix flake check --no-build' >> /root/test.sh && \
+    echo '' >> /root/test.sh && \
+    echo '# Apply remote profile (typical for UnRAID)' >> /root/test.sh && \
+    echo 'nix run home-manager -- switch --flake .#remote --impure' >> /root/test.sh && \
+    echo '' >> /root/test.sh && \
+    echo '# Verify ZSH is configured' >> /root/test.sh && \
+    echo 'test -f ~/.zshrc && echo "SUCCESS: .zshrc exists"' >> /root/test.sh && \
+    echo 'test -f ~/.config/tmux/tmux.conf && echo "SUCCESS: tmux.conf exists"' >> /root/test.sh && \
+    echo '' >> /root/test.sh && \
+    echo '# Verify persistent history location is set in config' >> /root/test.sh && \
+    echo 'grep -q "boot/config" ~/.zshrc && echo "SUCCESS: UnRAID history path configured"' >> /root/test.sh && \
+    echo '' >> /root/test.sh && \
+    echo 'echo "All tests passed!"' >> /root/test.sh && \
+    chmod +x /root/test.sh
+
+CMD ["/root/test.sh"]

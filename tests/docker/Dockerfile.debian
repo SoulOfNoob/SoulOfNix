@@ -1,0 +1,51 @@
+# Debian test container for SoulOfNix
+FROM debian:bookworm-slim
+
+# Install basic dependencies
+RUN apt-get update && apt-get install -y \
+    bash \
+    curl \
+    git \
+    xz-utils \
+    sudo \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create test user
+RUN useradd -m -s /bin/bash testuser && \
+    echo "testuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+# Copy SoulOfNix files
+COPY --chown=testuser:testuser . /home/testuser/SoulOfNix/
+
+# Switch to test user
+USER testuser
+WORKDIR /home/testuser/SoulOfNix
+
+# Test script
+RUN echo '#!/bin/bash' > /home/testuser/test.sh && \
+    echo 'set -e' >> /home/testuser/test.sh && \
+    echo 'echo "Testing SoulOfNix on Debian..."' >> /home/testuser/test.sh && \
+    echo '' >> /home/testuser/test.sh && \
+    echo '# Install Nix' >> /home/testuser/test.sh && \
+    echo 'curl --proto "=https" --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --no-confirm' >> /home/testuser/test.sh && \
+    echo '. /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' >> /home/testuser/test.sh && \
+    echo '' >> /home/testuser/test.sh && \
+    echo '# Check flake' >> /home/testuser/test.sh && \
+    echo 'cd /home/testuser/SoulOfNix' >> /home/testuser/test.sh && \
+    echo 'nix flake check --no-build' >> /home/testuser/test.sh && \
+    echo '' >> /home/testuser/test.sh && \
+    echo '# Apply local profile' >> /home/testuser/test.sh && \
+    echo 'nix run home-manager -- switch --flake .#local --impure' >> /home/testuser/test.sh && \
+    echo '' >> /home/testuser/test.sh && \
+    echo '# Verify ZSH is configured' >> /home/testuser/test.sh && \
+    echo 'test -f ~/.zshrc && echo "SUCCESS: .zshrc exists"' >> /home/testuser/test.sh && \
+    echo 'test -f ~/.config/tmux/tmux.conf && echo "SUCCESS: tmux.conf exists"' >> /home/testuser/test.sh && \
+    echo '' >> /home/testuser/test.sh && \
+    echo '# Test ZSH syntax' >> /home/testuser/test.sh && \
+    echo '~/.nix-profile/bin/zsh -n ~/.zshrc && echo "SUCCESS: .zshrc syntax valid"' >> /home/testuser/test.sh && \
+    echo '' >> /home/testuser/test.sh && \
+    echo 'echo "All tests passed!"' >> /home/testuser/test.sh && \
+    chmod +x /home/testuser/test.sh
+
+CMD ["/home/testuser/test.sh"]

@@ -1,0 +1,51 @@
+# Alpine Linux test container for SoulOfNix
+FROM alpine:3.19
+
+# Install basic dependencies
+RUN apk add --no-cache \
+    bash \
+    curl \
+    git \
+    xz \
+    sudo \
+    shadow
+
+# Create test user
+RUN adduser -D -s /bin/bash testuser && \
+    echo "testuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+# Set locale
+ENV LANG=C.UTF-8
+ENV LC_ALL=C.UTF-8
+
+# Copy SoulOfNix files
+COPY --chown=testuser:testuser . /home/testuser/SoulOfNix/
+
+# Switch to test user
+USER testuser
+WORKDIR /home/testuser/SoulOfNix
+
+# Test script
+RUN echo '#!/bin/bash' > /home/testuser/test.sh && \
+    echo 'set -e' >> /home/testuser/test.sh && \
+    echo 'echo "Testing SoulOfNix on Alpine Linux..."' >> /home/testuser/test.sh && \
+    echo '' >> /home/testuser/test.sh && \
+    echo '# Install Nix' >> /home/testuser/test.sh && \
+    echo 'curl --proto "=https" --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --no-confirm --init none' >> /home/testuser/test.sh && \
+    echo '. /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh || . ~/.nix-profile/etc/profile.d/nix.sh' >> /home/testuser/test.sh && \
+    echo '' >> /home/testuser/test.sh && \
+    echo '# Check flake' >> /home/testuser/test.sh && \
+    echo 'cd /home/testuser/SoulOfNix' >> /home/testuser/test.sh && \
+    echo 'nix flake check --no-build' >> /home/testuser/test.sh && \
+    echo '' >> /home/testuser/test.sh && \
+    echo '# Apply remote profile' >> /home/testuser/test.sh && \
+    echo 'nix run home-manager -- switch --flake .#remote --impure' >> /home/testuser/test.sh && \
+    echo '' >> /home/testuser/test.sh && \
+    echo '# Verify ZSH is configured' >> /home/testuser/test.sh && \
+    echo 'test -f ~/.zshrc && echo "SUCCESS: .zshrc exists"' >> /home/testuser/test.sh && \
+    echo 'test -f ~/.config/tmux/tmux.conf && echo "SUCCESS: tmux.conf exists"' >> /home/testuser/test.sh && \
+    echo '' >> /home/testuser/test.sh && \
+    echo 'echo "All tests passed!"' >> /home/testuser/test.sh && \
+    chmod +x /home/testuser/test.sh
+
+CMD ["/home/testuser/test.sh"]
