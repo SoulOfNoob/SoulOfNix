@@ -9,7 +9,7 @@
     # Development tools
     pkgs.gh # GitHub CLI
     pkgs.lazygit # Terminal UI for git
-    pkgs.delta # Better git diffs
+    # delta is provided by programs.delta.enable below
 
     # File utilities
     pkgs.bat # Better cat
