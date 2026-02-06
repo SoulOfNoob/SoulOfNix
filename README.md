@@ -150,21 +150,25 @@ make -C tests test-lib
 nix flake check
 ```
 
-### GitHub Actions (macOS + Linux)
+### GitHub Actions (Automated CI/CD)
 
-Manual testing workflow available for comprehensive cross-platform testing:
+**✅ Automatic testing on every push to main and all pull requests!**
 
-1. Go to **Actions** tab in GitHub
-2. Select **"SoulOfNix Tests"** workflow
-3. Click **"Run workflow"** button
-4. Choose which tests to run:
-   - ✅ **Linux Docker tests** (Debian, Alpine, Arch, Slackware)
-   - ✅ **macOS tests** (Apple Silicon + Intel)
+**12 tests run in parallel:**
 
-**Platforms tested:**
-- Linux: Debian, Alpine, Arch, Slackware (Docker)
-- macOS: Sonoma (14), Sequoia (15) - Apple Silicon
-- Total: 6 platforms tested automatically
+**Linux (8 tests via Docker):**
+- Debian × `remote`, `local`
+- Alpine × `remote`, `local`
+- Arch × `remote`, `local`
+- Slackware × `remote`, `local`
+
+**macOS (4 tests via GitHub runners):**
+- macOS 14 (Sonoma) × `local`, `work`
+- macOS 15 (Sequoia) × `local`, `work`
+
+View test results: **Actions** tab in GitHub
+
+Manual trigger: **Actions** → **Tests** → **Run workflow**
 
 ## Updating
 
@@ -219,12 +223,13 @@ See [DEVELOPMENT.md](DEVELOPMENT.md) for implementation notes, gotchas, and less
 
 ## Documentation
 
+- **[CI_IMPLEMENTATION.md](CI_IMPLEMENTATION.md)** - GitHub Actions CI/CD implementation and fixes ⭐
+- **[.github/TESTING.md](.github/TESTING.md)** - Testing guide and current status
 - **[IMPROVEMENTS.md](IMPROVEMENTS.md)** - Complete refactoring history and improvements
 - **[OPTIMIZATIONS.md](OPTIMIZATIONS.md)** - Low-hanging fruit optimizations
 - **[NIX_BEST_PRACTICES.md](NIX_BEST_PRACTICES.md)** - Comprehensive Nix best practices guide
 - **[DEVELOPMENT.md](DEVELOPMENT.md)** - Implementation notes and lessons learned
 - **[MIGRATION.md](MIGRATION.md)** - Migration guide from other setups
-- **[.github/TESTING.md](.github/TESTING.md)** - GitHub Actions testing guide
 
 ## License
 
