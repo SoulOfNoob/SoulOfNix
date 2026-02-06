@@ -23,7 +23,7 @@
       # No systemd plugin - Alpine uses OpenRC
     ];
 
-    initExtra = lib.mkAfter ''
+    initContent = lib.mkAfter ''
       # Alpine Linux specific settings
 
       # SSH agent configuration

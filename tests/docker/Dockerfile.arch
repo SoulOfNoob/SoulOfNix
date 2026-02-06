@@ -27,23 +27,39 @@ RUN echo '#!/bin/bash' > /home/testuser/test.sh && \
     echo 'set -e' >> /home/testuser/test.sh && \
     echo 'echo "Testing SoulOfNix on Arch Linux..."' >> /home/testuser/test.sh && \
     echo '' >> /home/testuser/test.sh && \
-    echo '# Install Nix' >> /home/testuser/test.sh && \
-    echo 'curl --proto "=https" --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --no-confirm' >> /home/testuser/test.sh && \
+    echo '# Detect architecture' >> /home/testuser/test.sh && \
+    echo 'ARCH=$(uname -m)' >> /home/testuser/test.sh && \
+    echo 'if [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then' >> /home/testuser/test.sh && \
+    echo '  PROFILE_SUFFIX="-aarch64"' >> /home/testuser/test.sh && \
+    echo 'else' >> /home/testuser/test.sh && \
+    echo '  PROFILE_SUFFIX=""' >> /home/testuser/test.sh && \
+    echo 'fi' >> /home/testuser/test.sh && \
+    echo 'echo "Architecture: $ARCH, Profile suffix: $PROFILE_SUFFIX"' >> /home/testuser/test.sh && \
+    echo '' >> /home/testuser/test.sh && \
+    echo '# Install Nix (no systemd in Docker)' >> /home/testuser/test.sh && \
+    echo 'curl --proto "=https" --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install linux --no-confirm --init none' >> /home/testuser/test.sh && \
+    echo '' >> /home/testuser/test.sh && \
+    echo '# Start nix-daemon manually (no init system in Docker)' >> /home/testuser/test.sh && \
+    echo 'sudo /nix/var/nix/profiles/default/bin/nix-daemon &' >> /home/testuser/test.sh && \
+    echo 'sleep 2' >> /home/testuser/test.sh && \
+    echo '' >> /home/testuser/test.sh && \
+    echo '# Source nix profile and set USER' >> /home/testuser/test.sh && \
+    echo 'export USER=$(whoami)' >> /home/testuser/test.sh && \
     echo '. /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' >> /home/testuser/test.sh && \
     echo '' >> /home/testuser/test.sh && \
     echo '# Check flake' >> /home/testuser/test.sh && \
     echo 'cd /home/testuser/SoulOfNix' >> /home/testuser/test.sh && \
     echo 'nix flake check --no-build' >> /home/testuser/test.sh && \
     echo '' >> /home/testuser/test.sh && \
-    echo '# Apply work profile' >> /home/testuser/test.sh && \
-    echo 'nix run home-manager -- switch --flake .#work --impure' >> /home/testuser/test.sh && \
+    echo '# Apply work profile with correct architecture' >> /home/testuser/test.sh && \
+    echo 'nix run home-manager -- switch --flake ".#work${PROFILE_SUFFIX}" --impure' >> /home/testuser/test.sh && \
     echo '' >> /home/testuser/test.sh && \
     echo '# Verify ZSH is configured' >> /home/testuser/test.sh && \
-    echo 'test -f ~/.zshrc && echo "SUCCESS: .zshrc exists"' >> /home/testuser/test.sh && \
+    echo 'test -f ~/.config/zsh/.zshrc && echo "SUCCESS: .zshrc exists"' >> /home/testuser/test.sh && \
     echo 'test -f ~/.config/tmux/tmux.conf && echo "SUCCESS: tmux.conf exists"' >> /home/testuser/test.sh && \
     echo '' >> /home/testuser/test.sh && \
     echo '# Test ZSH syntax' >> /home/testuser/test.sh && \
-    echo '~/.nix-profile/bin/zsh -n ~/.zshrc && echo "SUCCESS: .zshrc syntax valid"' >> /home/testuser/test.sh && \
+    echo '~/.nix-profile/bin/zsh -n ~/.config/zsh/.zshrc && echo "SUCCESS: .zshrc syntax valid"' >> /home/testuser/test.sh && \
     echo '' >> /home/testuser/test.sh && \
     echo 'echo "All tests passed!"' >> /home/testuser/test.sh && \
     chmod +x /home/testuser/test.sh

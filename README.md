@@ -185,6 +185,10 @@ chsh -s $(which zsh)
 . ~/.nix-profile/etc/profile.d/nix.sh
 ```
 
+## Development
+
+See [DEVELOPMENT.md](DEVELOPMENT.md) for implementation notes, gotchas, and lessons learned.
+
 ## License
 
 MIT

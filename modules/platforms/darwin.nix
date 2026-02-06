@@ -25,7 +25,7 @@
       "brew"         # Homebrew integration
     ];
 
-    initExtra = lib.mkAfter ''
+    initContent = lib.mkAfter ''
       # macOS-specific settings
 
       # Homebrew paths (if installed)
@@ -61,14 +61,7 @@
     };
   };
 
-  # SSH configuration for macOS with 1Password
-  programs.ssh = {
-    extraConfig = lib.mkAfter ''
-      # 1Password SSH Agent
-      Host *
-        IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
-    '';
-  };
+  # SSH configuration for macOS with 1Password is in modules/home/ssh.nix
 
   # Git configuration for macOS
   programs.git = {

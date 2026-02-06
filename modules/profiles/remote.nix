@@ -13,7 +13,7 @@
   # Simpler prompt for remote servers
   programs.zsh = {
     # Override some settings for remote
-    initExtra = lib.mkAfter ''
+    initContent = lib.mkAfter ''
       # Indicate this is a remote session
       export SOUL_OF_NIX_PROFILE="remote"
     '';

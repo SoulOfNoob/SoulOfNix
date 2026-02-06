@@ -8,31 +8,28 @@ in
   programs.ssh = {
     enable = true;
 
-    # Common SSH options
-    extraConfig = ''
-      # Prefer ed25519 keys
-      IdentitiesOnly yes
+    # Disable default config to avoid deprecation warning
+    enableDefaultConfig = false;
 
-      # Keep connections alive
-      ServerAliveInterval 60
-      ServerAliveCountMax 3
-
-      # Reuse connections
-      ControlMaster auto
-      ControlPath ~/.ssh/sockets/%r@%h-%p
-      ControlPersist 600
-
-      # Security
-      HashKnownHosts yes
-      VisualHostKey no
-    '' + lib.optionalString isDarwin ''
-      # macOS: Use 1Password SSH agent
-      IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
-
-      # macOS: Use Keychain for passphrase
-      AddKeysToAgent yes
-      UseKeychain yes
-    '';
+    # Match blocks for configuration
+    matchBlocks = {
+      "*" = {
+        identitiesOnly = true;
+        serverAliveInterval = 60;
+        serverAliveCountMax = 3;
+        extraOptions = {
+          ControlMaster = "auto";
+          ControlPath = "~/.ssh/sockets/%r@%h-%p";
+          ControlPersist = "600";
+          HashKnownHosts = "yes";
+          VisualHostKey = "no";
+        } // lib.optionalAttrs isDarwin {
+          IdentityAgent = "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock";
+          AddKeysToAgent = "yes";
+          UseKeychain = "yes";
+        };
+      };
+    };
 
     # Known hosts file
     userKnownHostsFile = "~/.ssh/known_hosts";
@@ -44,15 +41,16 @@ in
   # Manage authorized_keys for remote profile
   home.file.".ssh/authorized_keys" = lib.mkIf (authorizedKeys != []) {
     text = lib.concatStringsSep "\n" authorizedKeys + "\n";
-    # Proper permissions
   };
 
   # SSH directory permissions are handled by home-manager activation
+  # Note: Only chmod real files, not symlinks (which point to read-only nix store)
   home.activation.sshPermissions = lib.hm.dag.entryAfter ["writeBoundary"] ''
     if [ -d "$HOME/.ssh" ]; then
       $DRY_RUN_CMD chmod 700 "$HOME/.ssh"
-      [ -f "$HOME/.ssh/authorized_keys" ] && $DRY_RUN_CMD chmod 600 "$HOME/.ssh/authorized_keys"
-      [ -f "$HOME/.ssh/config" ] && $DRY_RUN_CMD chmod 600 "$HOME/.ssh/config"
+      # Only chmod if it's a real file, not a symlink
+      [ -f "$HOME/.ssh/authorized_keys" ] && [ ! -L "$HOME/.ssh/authorized_keys" ] && $DRY_RUN_CMD chmod 600 "$HOME/.ssh/authorized_keys"
+      [ -f "$HOME/.ssh/config" ] && [ ! -L "$HOME/.ssh/config" ] && $DRY_RUN_CMD chmod 600 "$HOME/.ssh/config"
     fi
   '';
 }

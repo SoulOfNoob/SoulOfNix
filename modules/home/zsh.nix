@@ -11,6 +11,9 @@ in
   programs.zsh = {
     enable = true;
 
+    # Set dotDir to silence deprecation warning
+    dotDir = ".config/zsh";
+
     # Enable completion
     enableCompletion = true;
 
@@ -45,8 +48,8 @@ in
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
 
-    # Shell aliases
-    shellAliases = {
+    # Shell aliases - use mkDefault so profiles can override
+    shellAliases = lib.mapAttrs (name: lib.mkDefault) {
       # Git aliases
       gcb = "git checkout -b";
       gco = "git checkout";
@@ -94,8 +97,8 @@ in
       }
     ];
 
-    # Init extra - loaded at the end of .zshrc
-    initExtra = ''
+    # Init content - loaded at the end of .zshrc
+    initContent = ''
       # Enable Powerlevel10k instant prompt
       if [[ -r "''${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-''${(%):-%n}.zsh" ]]; then
         source "''${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-''${(%):-%n}.zsh"

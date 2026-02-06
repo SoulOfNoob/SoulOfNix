@@ -8,19 +8,33 @@ DOCKER_RUN := $(DOCKER) run --rm
 # Test images
 IMAGES := alpine debian arch slackware
 
-.PHONY: all build test clean $(IMAGES) $(addprefix test-,$(IMAGES)) $(addprefix build-,$(IMAGES))
+.PHONY: all build test clean help check fmt \
+        build-alpine build-debian build-arch build-slackware \
+        test-alpine test-debian test-arch test-slackware
 
 all: test
 
 # Build all test images
-build: $(addprefix build-,$(IMAGES))
+build: build-alpine build-debian build-arch build-slackware
 
-build-%:
-	@echo "Building test image: soulofnix-test-$*"
-	$(DOCKER_BUILD) -t soulofnix-test-$* -f docker/Dockerfile.$* ..
+build-alpine:
+	@echo "Building test image: soulofnix-test-alpine"
+	$(DOCKER_BUILD) -t soulofnix-test-alpine -f docker/Dockerfile.alpine ..
+
+build-debian:
+	@echo "Building test image: soulofnix-test-debian"
+	$(DOCKER_BUILD) -t soulofnix-test-debian -f docker/Dockerfile.debian ..
+
+build-arch:
+	@echo "Building test image: soulofnix-test-arch"
+	$(DOCKER_BUILD) -t soulofnix-test-arch -f docker/Dockerfile.arch ..
+
+build-slackware:
+	@echo "Building test image: soulofnix-test-slackware"
+	$(DOCKER_BUILD) -t soulofnix-test-slackware -f docker/Dockerfile.slackware ..
 
 # Run all tests
-test: $(addprefix test-,$(IMAGES))
+test: test-alpine test-debian test-arch test-slackware
 
 # Individual tests
 test-alpine: build-alpine
@@ -52,7 +66,7 @@ fmt:
 # Clean up test images
 clean:
 	@echo "Removing test images..."
-	-$(DOCKER) rmi $(addprefix soulofnix-test-,$(IMAGES)) 2>/dev/null || true
+	-$(DOCKER) rmi soulofnix-test-alpine soulofnix-test-debian soulofnix-test-arch soulofnix-test-slackware 2>/dev/null || true
 
 # Help
 help:

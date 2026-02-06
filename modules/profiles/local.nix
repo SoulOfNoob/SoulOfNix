@@ -42,7 +42,7 @@
       lg = "lazygit";
     };
 
-    initExtra = lib.mkAfter ''
+    initContent = lib.mkAfter ''
       # Profile indicator
       export SOUL_OF_NIX_PROFILE="local"
 

@@ -23,7 +23,7 @@
       "systemd"      # Systemd shortcuts
     ];
 
-    initExtra = lib.mkAfter ''
+    initContent = lib.mkAfter ''
       # Linux-specific settings
 
       # SSH agent configuration

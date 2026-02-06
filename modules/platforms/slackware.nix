@@ -23,7 +23,7 @@
       # No systemd - Slackware uses SysV init
     ];
 
-    initExtra = lib.mkAfter ''
+    initContent = lib.mkAfter ''
       # Slackware / UnRAID specific settings
 
       # SSH agent configuration

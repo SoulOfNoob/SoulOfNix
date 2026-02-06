@@ -17,11 +17,17 @@ let
   isDarwin = lib.hasSuffix "darwin" system;
   isLinux = lib.hasSuffix "linux" system;
 
-  # Default username and home directory based on platform
-  defaultUsername = if isDarwin then builtins.getEnv "USER" else "root";
-  defaultHomeDir = if isDarwin
-    then "/Users/${if username != null then username else defaultUsername}"
-    else "/home/${if username != null then username else defaultUsername}";
+  # Get username from environment (requires --impure flag)
+  # Falls back to "root" for Linux if USER env is not set
+  envUser = builtins.getEnv "USER";
+  defaultUsername = if envUser != "" then envUser else (if isDarwin then "nobody" else "root");
+
+  # Default home directory based on platform
+  defaultHomeDir =
+    let user = if username != null then username else defaultUsername;
+    in if isDarwin
+       then "/Users/${user}"
+       else if user == "root" then "/root" else "/home/${user}";
 
   finalUsername = if username != null then username else defaultUsername;
   finalHomeDir = if homeDirectory != null then homeDirectory else defaultHomeDir;

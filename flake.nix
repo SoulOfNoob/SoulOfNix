@@ -46,6 +46,11 @@
           system = "x86_64-linux";
         };
 
+        "local-aarch64" = mkHome {
+          profile = "local";
+          system = "aarch64-linux";
+        };
+
         "local-darwin" = mkHome {
           profile = "local";
           system = "aarch64-darwin";
@@ -62,9 +67,19 @@
           system = "x86_64-linux";
         };
 
+        "work-aarch64" = mkHome {
+          profile = "work";
+          system = "aarch64-linux";
+        };
+
         "work-darwin" = mkHome {
           profile = "work";
           system = "aarch64-darwin";
+        };
+
+        "work-darwin-x86" = mkHome {
+          profile = "work";
+          system = "x86_64-darwin";
         };
       };
 
